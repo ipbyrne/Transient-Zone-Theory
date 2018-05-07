@@ -5,9 +5,13 @@ This is an indicator I created for analyzing a stochastic process by classifying
 ## STOCHASTIC PROCESSES
 Basic Notion
 Often the systems we consider that evolve in time and we are interested in their dynamic behavior, usually involving some degree of randomness. This like:
+
 The length of a queue.
+
 The number of students passing the SAT each year.
+
 The temperature outside.
+
 The number of data packets in a network.
 
 A stochastic process Xt or X(t) is a family of random variables index by a parameter t (usually time).
