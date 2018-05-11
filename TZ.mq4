@@ -44,6 +44,9 @@ int rLowSpreadDist[10000];
 int urHighSpreadDist[10000];
 int urLowSpreadDist[10000];
 
+int BLOne = 0;
+int BLTwo = 0;
+
 //+------------------------------------------------------------------+
 //| Custom indicator initialization function                         |
 //+------------------------------------------------------------------+
@@ -378,14 +381,41 @@ int OnCalculate(const int rates_total,
   PTZRF[0] = double(topResolveonFormBar + bottomResolveonFormBar)/double(totalTopPTZs + totalBottomPTZs);
   PTZRFR[0] = double(PTZRFRc)/double(totalTopPTZs + totalBottomPTZs);
   
+  
+  //--------------------------
+  // Find Spread Distance Balance Levels
+  //--------------------------
+  int sum = 0;
+  double runningTotal = 0;
+  int x = 0;
+  while(x < lowSpreadMax && x < highSpreadMax)
+     {
+     sum += lowSpreadDist[x] + highSpreadDist[x];
+     x++;
+     }
+
+     x = 0;
+  while(x < lowSpreadMax && x < highSpreadMax)
+     {
+     double probability;
+     if(double(lowSpreadDist[x]) == 0 && double(highSpreadDist[x]) == 0) {probability = 0.0;} else {probability = (double(lowSpreadDist[x] + highSpreadDist[x])/double(sum));}
+   
+     runningTotal += probability;
+   
+     // Check for level
+     if(runningTotal >= .50 && BLOne == 0) {BLOne = x;}
+     if(runningTotal >= .75 && BLTwo == 0) {BLTwo = x;}
+     x++;
+     }
+  
   //-----------------------------------------------
   // Find All Outcome Probabilties & Add to Buffers
   //-----------------------------------------------
   // Find SL (Resolved within 2k) & RTP (Resolved After Breach r) - Resolves 
-  int x = 0;
+  x = 0;
   int rsum = 0;
   int ursum = 0;
-  double runningTotal = 0;
+  runningTotal = 0;
   while(x<highSpreadMax || x<lowSpreadMax)
      {
      rsum+= rHighSpreadDist[x];
@@ -398,7 +428,6 @@ int OnCalculate(const int rates_total,
   x = 0;
   while(x<highSpreadMax || x<lowSpreadMax)
    {
-   double probability;
    if(rHighSpreadDist[x] == 0 && rLowSpreadDist[x] == 0) {probability = 0;}
    else {probability = double(rHighSpreadDist[x] + rLowSpreadDist[x])/rsum;}
    runningTotal+= probability;
@@ -439,7 +468,7 @@ int OnCalculate(const int rates_total,
   
   if(factorSpreadRisk) {CSL[0] = RTP[0] + URTP[0] + URNTP[0] + ((MarketInfo(Symbol(),MODE_SPREAD)/10)/r);} else {CSL[0] = RTP[0] + URTP[0] + URNTP[0];}
   if(factorSpreadRisk) {CTP[0] = SL[0] - ((MarketInfo(Symbol(),MODE_SPREAD)/10)/r);} else {CTP[0] = SL[0];}
-  CEV[0] = ((CTP[0] * double(k)) - (CSL[0] * double(r-k)))/double(r-k);
+  CEV[0] = ((CTP[0] * double(k)) - (CSL[0] * double(BLTwo)))/double(BLTwo);
   
   if(drawStats) {DrawStats(totalTopPTZs, totalTopTZs, totalBottomPTZs, totalBottomTZs, topResolveonFormBar, bottomResolveonFormBar);}
   
@@ -548,6 +577,22 @@ void DrawStats(int totalTopPTZs, int totalTopTZs, int totalBottomPTZs, int total
   
   ObjectCreate(objprefix+IntegerToString(j),OBJ_LABEL,0,0,0);
   ObjectSetText(objprefix+IntegerToString(j),"% of PTZs That Resolve on Form Bar: " + DoubleToStr(PTZRF[0]*100, 2) + "%",7,"Verdana",Red);
+  ObjectSet(objprefix+IntegerToString(j),OBJPROP_CORNER,1);
+  ObjectSet(objprefix+IntegerToString(j),OBJPROP_XDISTANCE,10);
+  ObjectSet(objprefix+IntegerToString(j),OBJPROP_YDISTANCE,i);
+  i+=10;
+  j++;
+  
+  ObjectCreate(objprefix+IntegerToString(j),OBJ_LABEL,0,0,0);
+  ObjectSetText(objprefix+IntegerToString(j),"50% Distance: " + IntegerToString(BLOne),7,"Verdana",Red);
+  ObjectSet(objprefix+IntegerToString(j),OBJPROP_CORNER,1);
+  ObjectSet(objprefix+IntegerToString(j),OBJPROP_XDISTANCE,10);
+  ObjectSet(objprefix+IntegerToString(j),OBJPROP_YDISTANCE,i);
+  i+=10;
+  j++;
+  
+  ObjectCreate(objprefix+IntegerToString(j),OBJ_LABEL,0,0,0);
+  ObjectSetText(objprefix+IntegerToString(j),"75% Distance: " + IntegerToString(BLTwo),7,"Verdana",Red);
   ObjectSet(objprefix+IntegerToString(j),OBJPROP_CORNER,1);
   ObjectSet(objprefix+IntegerToString(j),OBJPROP_XDISTANCE,10);
   ObjectSet(objprefix+IntegerToString(j),OBJPROP_YDISTANCE,i);
