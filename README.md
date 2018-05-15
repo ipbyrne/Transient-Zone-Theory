@@ -59,6 +59,6 @@ Null recurrent: expectation of first return time =
 
 ## The Theory
 
-Proposition 1: Let XT(t) be the value of a stochastic process at any time t relative to time-frame T. Then, almost-surely, there exists positive integers k, h such that every value g[XT(t) -k, XT(t) + k] is h(T) - recurrent.
+**Proposition 1:** Let XT(t) be the value of a stochastic process at any time t relative to time-frame T. Then, almost-surely, there exists positive integers k, h such that every value g[XT(t) -k, XT(t) + k] is h(T) - recurrent.
 
-Definition 1: A value XT(t0) is h(T) - recurrent if whenever XT(t0) is between the high and low value of the period T, then at least one of the previous or next h periods passes through XT(t0).
+**Definition 1:** A value XT(t0) is h(T) - recurrent if whenever XT(t0) is between the high and low value of the period T, then at least one of the previous or next h periods passes through XT(t0).
